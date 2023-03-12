@@ -4,7 +4,8 @@ from flask_restful import fields
 download_fields = {
     'link': fields.String(attribute='link'),
     'initial_time': fields.String(attribute='initial_time'),
-    'final_time': fields.String(attribute='final_time')
+    'final_time': fields.String(attribute='final_time'),
+    'video': fields.String(attribute='video')
 }
 class Download(db.Model):
     __tablename__ = "tb_download"
@@ -12,13 +13,15 @@ class Download(db.Model):
     link = db.Column(db.String(200), nullable=False)
     initial_time = db.Column(db.String(8), nullable=False)
     final_time = db.Column(db.String(8), nullable=False)
+    video = db.Column(db.LargeBinary())
 
     
-    def __init__(self, link, initial_time, final_time):
+    def __init__(self, link, initial_time, final_time, video):
         self.link = link
         self.initial_time = initial_time
         self.final_time = final_time
+        self.video = video
 
 
     def __repr__(self):
-        return f'Downloads(link={self.link}, initial_time={self.initial_time}, final_time={self.final_time})'
+        return f'Downloads(link={self.link}, initial_time={self.initial_time}, final_time={self.final_time} video={self.video})'

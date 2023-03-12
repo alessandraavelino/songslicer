@@ -16,7 +16,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 
 
-download = Download("email@gmail.com", "Venha se cadastrar no nosso aplicativo", "teste")
+download = Download("email@gmail.com", "Venha se cadastrar no nosso aplicativo", "teste", "")
 print(download)
 db.init_app(app)
 migrate.init_app(app, db)

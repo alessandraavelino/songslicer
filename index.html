@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      const MP3Encoder = lamejs.Mp3Encoder;
+
+      fetch("http://localhost:5000/downloads")
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          data.map((el) => {
+            console.log(el.video);
+            audioOk = el.video;
+
+            // Configuração do encoder
+            // bytes do áudio em um array
+            const audioBytes = [
+                audioOk
+            ];
+
+            // Configuração do encoder
+            const channels = 2; // 2 canais para stereo
+            const sampleRate = 44100; // 44.1 kHz
+            const kbps = 128; // Taxa de bits do MP3
+
+            // Cria o encoder
+            const MP3Encoder = lamejs.Mp3Encoder;
+            const mp3Encoder = new MP3Encoder(channels, sampleRate, kbps);
+
+            // Converte os bytes do áudio para uma matriz de amostras em ponto flutuante
+            const audioSamples = new Int16Array(audioBytes.buffer);
+            const samples = audioSamples.length / channels;
+            const samplesMono = new Float32Array(samples);
+
+            for (let i = 0; i < samples; i++) {
+              const sample = audioSamples[i * channels];
+              samplesMono[i] = sample / 32768.0; // Normaliza a amostra para um valor entre -1 e 1
+            }
+
+            // Codifica as amostras em MP3
+            const mp3Buffer = mp3Encoder.encodeBuffer(samplesMono);
+
+            // Finaliza a codificação
+            const mp3EndBuffer = mp3Encoder.flush();
+
+            // Concatena os buffers em um único array
+            const mp3Data = new Uint8Array(
+              mp3Buffer.length + mp3EndBuffer.length
+            );
+            mp3Data.set(mp3Buffer, 0);
+            mp3Data.set(mp3EndBuffer, mp3Buffer.length);
+
+            // Cria um blob a partir dos dados do MP3
+            const blob = new Blob([mp3Data], { type: "audio/mpeg" });
+
+            // Cria um URL temporário para o blob
+            const url = URL.createObjectURL(blob);
+
+            // Cria um link para download do arquivo MP3
+            const downloadLink = document.createElement("a");
+            downloadLink.href = url;
+            downloadLink.download = "audio.mp3";
+
+            // Clica no link para iniciar o download
+            downloadLink.click();
+
+            // Limpa o URL temporário
+            URL.revokeObjectURL(url);
+          });
+          // Manipule os dados JSON aqui
+        })
+        .catch((error) => {
+          // Manipule o erro aqui
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js"></script>
+  </body>
+</html>
